@@ -1,58 +1,92 @@
 
 var nivel = 1000;
+var qtdMovimentos = 3;
+
+var dom = {
+	shell : $('.shell'),
+	el1   : $('.shell1'),
+	el2   : $('.shell2'),
+	el3   : $('.shell3'),
+	open  : $('.open'),
+	itemLevel : $('#niveis li a'),
+	msg : $('.sidebar strong')
+};
+	
+var niveis = {
+	'easy'     : {"speed":1000,"move":3},
+	'normal'   : {"speed":500 ,"move":4},
+	'hard'     : {"speed":300 ,"move":5},
+	'very-hard': {"speed":200 ,"move":6},
+};
+
+var sound = new Audio('static/audio/theme.mp3'); 
 
 $(function(){
 
-	// Define o nivel do game conforme escolha do usuario
+	playAudio();
 
-	$('#niveis li a').on('click',function(e){
+	$('.playAudio').on('click',function(){
+		$('.stopAudio').removeClass('playerSelected');
+		$(this).addClass('playerSelected');
+		playAudio();
+	});
 
-		nivel = $(this).data('velocidade');
-		run( nivel );
+	$('.stopAudio').on('click',function(){
+		sound.pause();
+		$(this).addClass('playerSelected');
+		$('.playAudio').removeClass('playerSelected');
 		
-		$('#niveis li a').hide();
-
-		$('.sidebar strong').show();
-
 		return false;
 	});
 
-	// Permite o gammer repetir o jogo
-	
+	// Define o nivel do game conforme escolha do usuario
+	dom.itemLevel.on('click',function(e){
+		level = $(this).data('nivel');
+		run();
+		dom.itemLevel.hide();
+		dom.msg.show();
+		return false;
+	});
+
+	// Permite o gammer repetir o jogo	
 	$('.try-again').on('click',function(){
 		location.reload();
 	});
 });
 
-function run( nivel ){	
-	
-	shell = $('.shell');
-	shell2 = $('.shell2');
+function playAudio(){
 
-	var seq = ['1,3']; // Sequencia de movimentos [a,b] => a: barril1, b: barril2
+	sound.addEventListener('ended', function() {
+	    this.currentTime = 0;
+	    this.play();
+	}, false);		
+	sound.play();
 
-		shell2.css('height','214');	
+}
 
-	$('.open').animate({
-		top: '+=100'
-		
+function run(){	
+
+	nivel = niveis[level].speed;
+	qtdMovimentos = niveis[level].move;
+
+	dom.el2.css('height','214');	
+
+	dom.open.animate({
+		top: '+=100'		
 	}, 500, function() { // Animation complete.
-
-		for(var i=0, num = seq.length; i<num; i++){
-			el = seq[i].split(',');
-			movimento(el[0],el[1]);
-		}
 		
+		movimento();
+			
+		dom.shell.on('click',function(){
 
-		shell.on('click',function(){
-
-			shell2.animate({
+			dom.el2.animate({
 				top: '-=100'
 			}, 500, function() { // Animation complete.
 				$(this).css('height','311');
 			});
 
-			msg = $(this).hasClass('shell2') ? 'voce ganhou :)' : 'voce perdeu :(';	
+			msg = $(this).hasClass('shell2') ? 'você ganhou :)' : 'você perdeu :(';	
+
 			$('.sidebar strong').hide();
 			$('.try-again').show();
 			alert(msg);
@@ -61,58 +95,49 @@ function run( nivel ){
 
 	});	
 
-
-
 }
 
 /*
 	@description: Executa o movimento dado barril a e b
-	@params:a{int},b{int}
 */
 
-function movimento(a,b){
+function movimento(){
 
-	el1 = $('.shell'+a);
-	p1 = el1.position();
+	p1 = dom.el1.position();
+	p2 = dom.el2.position();
+	p3 = dom.el3.position();
+	
+	arrRand = [0,1,2];
+	rand = arrRand[Math.floor(Math.random() * arrRand.length)];
 
-	el2 = $('.shell'+b);
-	p2 = el2.position();
-
-	dir = ( a == 1 ) ? '+' : '-';
-	dir2 = ( a == 1 ) ? '-' : '+';
-	/*
-	if( p1.left == 0 ){
-		esq = ((p1.left+p2.left)/2);
-	}else{
-		esq = (p1.left+100);
-	}*/
-	pCentral = ((p1.left+p2.left)/2);
-
-	DestTopEl1 = '-=100';
-	DestLeftEl1 = dir+'='+pCentral;
-
-	DestTopEl2 = '+=100';
-	DestLeftEl2 = dir2+'='+pCentral;
-
-	el1.stop(true).animate(
-		{top:DestTopEl1, left:DestLeftEl1}, 
+	var combinacoes = [
+		[{"elFrom":dom.el1,"elTo":p2}, {"elFrom":dom.el2,"elTo":p1}],
+		[{"elFrom":dom.el2,"elTo":p3}, {"elFrom":dom.el3,"elTo":p2}],
+		[{"elFrom":dom.el3,"elTo":p1}, {"elFrom":dom.el1,"elTo":p3}]
+	];
+	
+	// Move shell A => B
+	combinacoes[rand][0].elFrom.stop(true).animate(
+		combinacoes[rand][0].elTo,
 		nivel, 
 		function() {
-			$(this).stop(true).animate(p2,nivel,function(){
-				//console.log('mov:' + a +':'+ b);
-			});
-			
+			/*silent*/
 		}
 	);
 
-	el2.stop(true).animate(
-		{top:DestTopEl2, left:DestLeftEl2},
+	// Move shell B => A
+	combinacoes[rand][1].elFrom.stop(true).animate(
+		combinacoes[rand][1].elTo,
 		nivel, 
 		function() {
-			$(this).stop(true).animate(p1,nivel,function(){
-				//console.log('mov:' + a +':'+ b);
-			});
+			if( qtdMovimentos > 1 ){
+				movimento();
+				qtdMovimentos--;
+			}else{
+				dom.msg.empty().html('Agora clique no barril onde esta a moeda');
+			}
 		}
-	);		
+	);
+
 
 }

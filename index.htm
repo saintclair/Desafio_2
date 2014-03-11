@@ -4,21 +4,25 @@
 		<meta charset="UTF-8">
 		<title>Game</title>
 		<link rel="stylesheet" href="static/css/main.min.css" />
+		<link href='http://fonts.googleapis.com/css?family=Audiowide|Freckle+Face' rel='stylesheet' type='text/css'>
 	</head>
 	<body>
 		<div id="main">
 			<div class="sidebar">
 				<h1>Menu</h1>
-				
+				<p class="player">
+					<a href="javascript:void(0)" class="playAudio playerSelected">play</a>
+					<a href="javascript:void(0)" class="stopAudio">pause</a>
+				<p>
 				<ul id="niveis">
-					<li><a href="javascript:void(0)" data-velocidade="1000">Easy</a></li>
-					<li><a href="javascript:void(0)" data-velocidade="500">Normal</a></li>
-					<li><a href="javascript:void(0)" data-velocidade="300">Hard</a></li>
-					<li><a href="javascript:void(0)" data-velocidade="100">Very Hard</a></li>
+					<li><a href="javascript:void(0)" data-nivel="easy">Easy</a></li>
+					<li><a href="javascript:void(0)" data-nivel="normal">Normal</a></li>
+					<li><a href="javascript:void(0)" data-nivel="hard">Hard</a></li>
+					<li><a href="javascript:void(0)" data-nivel="very-hard">Very Hard</a></li>
 				</ul>	
-				<a href="javascript:void(0)" class="try-again">Tente novamente</a>
+				<a href="javascript:void(0)" class="try-again"> << Tente novamente</a>
 
-				<strong>Fique de olho e clique no barril onde esta a moeda</strong>
+				<strong>Fique de olho ...</strong>
 			</div>
 			<div class="middle">
 				<div class="shell shell1"></div>
@@ -27,7 +31,7 @@
 			</div>
 			<div class="footer"></div>
 		</div>
-
+		<!--<embed id="tst" height="0" width="100" src="static/audio/theme.mp3">-->
 		<script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
 		<script src="static/js/main.min.js"></script>
 	</body>
